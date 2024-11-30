@@ -64,7 +64,7 @@ export const getTranscription = async (req: Request, res: Response) => {
                 status: "COMPLETED",
                 transcription,
             });
-            return;
+            return
         }
 
         // 2. check if already transcribing
@@ -75,7 +75,7 @@ export const getTranscription = async (req: Request, res: Response) => {
             res.json({
                 status: existingJob.TranscriptionJob.TranscriptionJobStatus,
             });
-            return;
+            return
         }
 
         // 4. creating new transcription job

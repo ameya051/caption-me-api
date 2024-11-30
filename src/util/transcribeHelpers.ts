@@ -1,5 +1,8 @@
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { GetTranscriptionJobCommand, StartTranscriptionJobCommand, TranscribeClient } from "@aws-sdk/client-transcribe";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const transcribeClient = new TranscribeClient({
     region: process.env.BUCKET_REGION,
