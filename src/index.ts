@@ -5,6 +5,7 @@ import router from "./routes/index"
 
 dotenv.config();
 
+
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server is running');
 });
+
 app.use("/api/",router)
 
 app.listen(port, () => {
