@@ -18,15 +18,19 @@
     "aws-crt": "^1.24.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.44.1",
     "express": "^4.21.1",
     "ioredis": "^5.4.1",
+    "postgres": "^3.4.7",
     "request-ip": "^3.3.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.1",
+    "drizzle-kit": "^0.31.1",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.7.2"
   }
 }
