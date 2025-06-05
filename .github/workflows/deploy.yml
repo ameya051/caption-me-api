@@ -35,4 +35,6 @@ jobs:
           cd /home/ubuntu/caption-me-api
           git pull origin master
           pnpm install
+          pnpm build
           pm2 restart caption-me-api
+          pm2 start ecosystem.config.js
