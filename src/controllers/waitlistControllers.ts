@@ -7,21 +7,21 @@ export const addToWaitlist = async (req: Request, res: Response) => {
     try {
         const { email } = req.body;
         if (!email) {
-            res.json({ success: false, message: 'Email is required.' });
+            res.status(400).json({ success: false, message: 'Email is required.' });
             return
         }
 
         const existingEntry = await db.select().from(waitlist).
         where(eq(email, waitlist.email));
         if (existingEntry.length > 0) {
-            res.json({ success: false, message: "You're already in the waitlist." });
+            res.status(409).json({ success: false, message: "You're already in the waitlist." });
             return;
         }
 
         await db.insert(waitlist).values({ email }).returning();
-        res.json({ success: true, message: `You've been added to waitlist.` });
+        res.status(201).json({ success: true, message: `You've been added to waitlist.` });
     } catch (error) {
         console.error('Error adding to waitlist:', error);
-        res.json({ success: false, message: 'Failed to add to waitlist.' });
+        res.status(500).json({ success: false, message: 'Failed to add to waitlist.' });
     }
 }
