@@ -36,5 +36,4 @@ jobs:
           git pull origin master
           pnpm install
           pnpm build
-          pm2 restart caption-me-api
-          pm2 start ecosystem.config.js
+          pm2 reload ecosystem.config.js
