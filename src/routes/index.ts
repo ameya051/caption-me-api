@@ -10,7 +10,7 @@ const router: Router = express.Router();
 router.use('/', authRoutes);
 
 // API routes
-router.put("/presigned", rateLimiterByIp, getPresignedUrl);
+router.put("/presigned", getPresignedUrl);
 router.get("/transcribe", getTranscription);
 router.post("/waitlist", addToWaitlist);
 

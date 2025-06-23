@@ -1,12 +1,22 @@
+import passport from 'passport';
 import { Request, Response } from 'express';
 import { db } from '../db';
 import { users, tokens } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import logger from '../logger';
+
+interface customRequest extends Request {
+    user?: {
+        id: number;
+        email: string;
+        role?: string;
+    };
+}
 
 // Helper function to generate tokens
-const generateTokens = async (userId: number, email: string, role: string) => {
+export const generateTokens = async (userId: number, email: string, role: string) => {
     const accessToken = jwt.sign(
         { id: userId, email, role },
         process.env.JWT_SECRET!,
@@ -33,7 +43,7 @@ const generateTokens = async (userId: number, email: string, role: string) => {
     return { accessToken, refreshToken };
 };
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (req: customRequest, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -104,7 +114,7 @@ export const register = async (req: Request, res: Response) => {
     }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: customRequest, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -171,7 +181,7 @@ export const login = async (req: Request, res: Response) => {
     }
 };
 
-export const logout = async (req: Request, res: Response) => {
+export const logout = async (req: customRequest, res: Response) => {
     try {
         const { refreshToken } = req.body;
 
@@ -180,7 +190,7 @@ export const logout = async (req: Request, res: Response) => {
                 success: false,
                 message: 'Refresh token is required'
             });
-            return 
+            return
         }
 
         // Delete refresh token from database
@@ -201,18 +211,18 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 // Optional: Refresh token endpoint
-export const refresh = async (req: Request, res: Response) => {
+export const refresh = async (req: customRequest, res: Response) => {
     try {
         if (!req.user?.id) {
             res.status(401).json({
                 success: false,
                 message: 'User not authenticated'
             });
-            return 
+            return
         }
 
         const userId = Number(req.user.id);
-        
+
         // Generate new tokens
         const { accessToken, refreshToken } = await generateTokens(
             userId,
@@ -236,4 +246,66 @@ export const refresh = async (req: Request, res: Response) => {
             message: 'Error refreshing token'
         });
     }
+};
+
+export const googleAuth = passport.authenticate('google', {
+    scope: ['profile', 'email']
+});
+
+export const googleCallback = async (req: customRequest, res: Response) => {
+    passport.authenticate('google', { session: false }, async (err: any, user: any) => {
+        if (err || !user) {
+            return res.redirect(`${process.env.FRONTEND_URL}/signin?error=oauth-failed`);
+        }
+
+        try {
+            const { accessToken, refreshToken } = await generateTokens(
+                user.id,
+                user.email,
+                user.role || 'user'
+            );
+
+            res.cookie('accessToken', accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 15 * 60 * 1000 // 15 minutes
+            });
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            });
+
+            res.redirect(`${process.env.FRONTEND_URL}/success`);
+        } catch (error) {
+            res.redirect(`${process.env.FRONTEND_URL}/signin?error=token-generation-failed`);
+        }
+    })(req, res);
+};
+
+export const githubAuth = passport.authenticate('github', { scope: ['user:email'] });
+
+export const githubCallback = async (req: customRequest, res: Response) => {
+    passport.authenticate('github', async (err: any, user: any) => {
+        if (err || !user) {
+            logger.error('GitHub OAuth error:', err);
+            return res.redirect(`${process.env.FRONTEND_URL}/signin?error=oauth-failed`);
+        }
+
+        try {
+            // Generate tokens
+            const { accessToken, refreshToken } = await generateTokens(
+                user.id,
+                user.email,
+                user.role || 'user'
+            );
+
+            // You might want to send these tokens in a more secure way
+            res.redirect(`${process.env.FRONTEND_URL}/success?access_token=${accessToken}&refresh_token=${refreshToken}`);
+        } catch (error) {
+            res.redirect(`${process.env.FRONTEND_URL}/signin?error=token-generation-failed`);
+        }
+    })(req, res);
 };
