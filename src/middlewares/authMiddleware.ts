@@ -16,63 +16,45 @@ export const authenticateJWT = async (
     next: NextFunction
 ) => {
     try {
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader) {
-            return res.status(401).json({
-                success: false,
-                message: 'Authorization header missing'
-            });
-        }
-
-        // Check if the header starts with "Bearer "
-        if (!authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid token format'
-            });
-        }
-
-        // Extract the token
-        const token = authHeader.split(' ')[1];
+        const token = req.cookies.accessToken;        
 
         if (!token) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 message: 'No token provided'
             });
+            return;
         }
 
-        // Verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
             id: number;
             email: string;
             role?: string;
         };
 
-        // Add user info to request object
         req.user = decoded;
-        
         next();
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 message: 'Token expired'
             });
+            return
         }
-        
+
         if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 message: 'Invalid token'
             });
+            return
         }
-
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
             message: 'Internal server error during authentication'
         });
+        return
     }
 };
 
@@ -90,7 +72,7 @@ export const verifyRefreshToken = async (
                 success: false,
                 message: 'Refresh token missing'
             });
-            return 
+            return
         }
 
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as {
@@ -103,7 +85,7 @@ export const verifyRefreshToken = async (
         next();
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
-             res.status(401).json({
+            res.status(401).json({
                 success: false,
                 message: 'Refresh token expired'
             });

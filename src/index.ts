@@ -4,6 +4,7 @@ import cors from "cors"
 import router from "./routes/index"
 import "./middlewares/passportConfig"
 import passport from 'passport';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions))
+app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());

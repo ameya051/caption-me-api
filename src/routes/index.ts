@@ -7,7 +7,7 @@ import authRoutes from './authRoutes';
 const router: Router = express.Router();
 
 // Auth routes
-router.use('/', authRoutes);
+router.use('/auth', authRoutes);
 
 // API routes
 router.put("/presigned", getPresignedUrl);

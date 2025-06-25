@@ -7,17 +7,21 @@ import {
   googleAuth,
   googleCallback,
   githubAuth,
-  githubCallback
+  githubCallback,
+  getMe
 } from '../controllers/authControllers';
-import { verifyRefreshToken } from '../middlewares/authMiddleware';
+import { verifyRefreshToken, authenticateJWT } from '../middlewares/authMiddleware';
 
 const router: Router = Router();
 
 // Regular auth routes
-router.post('/register', register);
-router.post('/login', login);
+router.post('/signup', register);
+router.post('/signin', login);
 router.post('/logout', logout);
 router.post('/refresh', verifyRefreshToken, refresh);
+
+// User info route
+router.get('/me', authenticateJWT, getMe);
 
 // OAuth routes
 router.get('/google', googleAuth);
