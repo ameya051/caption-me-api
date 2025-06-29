@@ -55,7 +55,7 @@ jobs:
 
             # Update environment variables
             echo "Updating environment variables..."
-            cat << EOF > .env
+            cat > .env <<EOF
             PORT=$PORT
             NODE_ENV=$NODE_ENV
             ACCESS_KEY=$ACCESS_KEY
