@@ -52,30 +52,7 @@ jobs:
           envs: PORT,NODE_ENV,ACCESS_KEY,SECRET_ACCESS_KEY,BUCKET_NAME,BUCKET_REGION,DEEPGRAM_API_KEY,REDIS_URL,REDIS_TOKEN,DATABASE_URL,JWT_SECRET,REFRESH_TOKEN_SECRET,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GH_CLIENT_ID,GH_CLIENT_SECRET,FRONTEND_URL
           script: |
             cd /home/ubuntu/caption-me-api || exit 1
-
-            # Update environment variables
-            echo "Updating environment variables..."
-            cat > .env <<EOF
-            PORT=$PORT
-            NODE_ENV=$NODE_ENV
-            ACCESS_KEY=$ACCESS_KEY
-            SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY
-            BUCKET_NAME=$BUCKET_NAME
-            BUCKET_REGION=$BUCKET_REGION
-            DEEPGRAM_API_KEY=$DEEPGRAM_API_KEY
-            REDIS_URL=$REDIS_URL
-            REDIS_TOKEN=$REDIS_TOKEN
-            DATABASE_URL=$DATABASE_URL
-            JWT_SECRET=$JWT_SECRET
-            REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET
-            GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
-            GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
-            GH_CLIENT_ID=$GH_CLIENT_ID
-            GH_CLIENT_SECRET=$GH_CLIENT_SECRET
-            FRONTEND_URL=$FRONTEND_URL
-            EOF
-
-            git pull origin master
+            git pull || exit 1
             mkdir -p logs
             pnpm install --frozen-lockfile || exit 1
             pnpm build || exit 1
