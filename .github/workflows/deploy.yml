@@ -27,29 +27,10 @@ jobs:
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.5
-        env:
-          PORT: ${{ secrets.PORT }}
-          NODE_ENV: ${{ secrets.NODE_ENV }}
-          ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
-          SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-          BUCKET_REGION: ${{ secrets.BUCKET_REGION }}
-          DEEPGRAM_API_KEY: ${{ secrets.DEEPGRAM_API_KEY }}
-          REDIS_URL: ${{ secrets.REDIS_URL }}
-          REDIS_TOKEN: ${{ secrets.REDIS_TOKEN }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
-          GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
-          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: PORT,NODE_ENV,ACCESS_KEY,SECRET_ACCESS_KEY,BUCKET_NAME,BUCKET_REGION,DEEPGRAM_API_KEY,REDIS_URL,REDIS_TOKEN,DATABASE_URL,JWT_SECRET,REFRESH_TOKEN_SECRET,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GH_CLIENT_ID,GH_CLIENT_SECRET,FRONTEND_URL
           script: |
             cd /home/ubuntu/caption-me-api || exit 1
             git pull || exit 1
