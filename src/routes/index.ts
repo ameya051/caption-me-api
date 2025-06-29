@@ -3,10 +3,11 @@ import express, { Router } from 'express';
 import { rateLimiterByIp } from '../middlewares/rateLimiter';
 import { addToWaitlist } from '../controllers/waitlistControllers';
 import authRoutes from './authRoutes';
+import healthRoute from './health';
 
 const router: Router = express.Router();
 
-// Auth routes
+router.use('/health',healthRoute)
 router.use('/auth', authRoutes);
 
 // API routes
