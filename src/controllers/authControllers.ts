@@ -262,7 +262,7 @@ export const googleCallback = async (req: customRequest, res: Response) => {
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             });
 
-            res.redirect(`${process.env.FRONTEND_URL}/success`);
+            res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
         } catch (error) {
             res.redirect(`${process.env.FRONTEND_URL}/signin?error=token-generation-failed`);
         }

@@ -5,6 +5,7 @@ import router from "./routes/index"
 import "./middlewares/passportConfig"
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
+import requestLogger from './middlewares/requestLogger';
 
 dotenv.config();
 
@@ -12,7 +13,7 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 
 // CORS configuration
-const allowedOrigins = process.env.NODE_ENV === 'production' 
+const allowedOrigins = process.env.NODE_ENV === 'production'
   ? ['https://captionme.ameyashr.in']
   : ['http://localhost:3000', 'https://captionme.ameyashr.in'];
 
@@ -34,6 +35,7 @@ app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
+app.use(requestLogger)
 
 app.use("/api/",router)
 app.get('/', (req: Request, res: Response) => {
