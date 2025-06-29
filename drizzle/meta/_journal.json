@@ -8,6 +8,13 @@
       "when": 1748978259689,
       "tag": "0000_tiny_mole_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1749915377293,
+      "tag": "0001_fantastic_king_cobra",
+      "breakpoints": true
     }
   ]
 }

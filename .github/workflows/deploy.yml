@@ -2,38 +2,49 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        
-    - name: Install dependencies
-      run: |
-        npm install -g pnpm
-        pnpm install
-        
-    - name: Build application
-      run: pnpm build # if you have a build step
-      
-    - name: Deploy to EC2
-      uses: appleboy/ssh-action@v0.1.5
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          cd /home/ubuntu/caption-me-api
-          git pull origin master
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          npm install -g pnpm
           pnpm install
-          pnpm build
-          pm2 reload ecosystem.config.js
+
+      - name: Build application
+        run: pnpm build # if you have a build step
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/caption-me-api || exit 1
+            git pull origin master
+            mkdir -p logs
+            pnpm install --frozen-lockfile || exit 1
+            pnpm build || exit 1
+            pm2 reload ecosystem.config.js --update-env || exit 1
+
+      - name: Health check
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sleep 10  # Wait for service to start
+            curl --fail http://localhost:3000/health || exit 1

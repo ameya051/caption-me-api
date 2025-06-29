@@ -2,11 +2,17 @@ import { getPresignedUrl, getTranscription } from '../controllers/videoControlle
 import express, { Router } from 'express';
 import { rateLimiterByIp } from '../middlewares/rateLimiter';
 import { addToWaitlist } from '../controllers/waitlistControllers';
+import authRoutes from './authRoutes';
+import healthRoute from './health';
 
 const router: Router = express.Router();
 
-router.put("/presigned",rateLimiterByIp, getPresignedUrl);
-router.get("/transcribe",getTranscription)
-router.post("/waitlist", addToWaitlist)
+router.use('/health',healthRoute)
+router.use('/auth', authRoutes);
+
+// API routes
+router.put("/presigned", getPresignedUrl);
+router.get("/transcribe", getTranscription);
+router.post("/waitlist", addToWaitlist);
 
 export default router;
