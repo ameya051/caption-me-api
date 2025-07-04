@@ -18,7 +18,7 @@ const router: Router = Router();
 router.post('/signup', register);
 router.post('/signin', login);
 router.post('/logout', logout);
-router.post('/refresh', verifyRefreshToken, refresh);
+router.post('/refresh', refresh);
 
 // User info route
 router.get('/me', authenticateJWT, getMe);

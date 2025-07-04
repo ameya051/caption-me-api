@@ -16,9 +16,11 @@ export const authenticateJWT = async (
     next: NextFunction
 ) => {
     try {
-        const token = req.cookies.accessToken;        
+        const accessToken = req.cookies.accessToken;
+        console.log("Access Token:", accessToken);
 
-        if (!token) {
+
+        if (!accessToken) {
             res.status(401).json({
                 success: false,
                 message: 'No token provided'
@@ -26,7 +28,7 @@ export const authenticateJWT = async (
             return;
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+        const decoded = jwt.verify(accessToken, process.env.JWT_SECRET!) as {
             id: number;
             email: string;
             role?: string;
@@ -65,7 +67,7 @@ export const verifyRefreshToken = async (
     next: NextFunction
 ) => {
     try {
-        const { refreshToken } = req.body;
+        const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
             res.status(401).json({
