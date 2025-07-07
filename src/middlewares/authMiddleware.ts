@@ -17,8 +17,6 @@ export const authenticateJWT = async (
 ) => {
     try {
         const accessToken = req.cookies.accessToken;
-        console.log("Access Token:", accessToken);
-
 
         if (!accessToken) {
             res.status(401).json({
@@ -60,7 +58,6 @@ export const authenticateJWT = async (
     }
 };
 
-// Optional: Refresh token middleware
 export const verifyRefreshToken = async (
     req: Request,
     res: Response,

@@ -1,6 +1,7 @@
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { GetTranscriptionJobCommand, StartTranscriptionJobCommand, TranscribeClient } from "@aws-sdk/client-transcribe";
 import dotenv from 'dotenv';
+import logger from '../logger'
 
 dotenv.config();
 
@@ -81,7 +82,7 @@ export async function getTranscriptionFile(filename: string): Promise<any> {
     try {
         transcriptionFileResponse = await s3client.send(getObjectCommand);
     } catch (e) {
-        console.error(e);
+        logger.error(e);
     }
     if (transcriptionFileResponse) {
         return JSON.parse(await streamToString(transcriptionFileResponse.Body));

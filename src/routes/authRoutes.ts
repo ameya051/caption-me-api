@@ -10,7 +10,7 @@ import {
   githubCallback,
   getMe
 } from '../controllers/authControllers';
-import { verifyRefreshToken, authenticateJWT } from '../middlewares/authMiddleware';
+import { authenticateJWT } from '../middlewares/authMiddleware';
 
 const router: Router = Router();
 

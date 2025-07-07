@@ -21,7 +21,6 @@ export const addToWaitlist = async (req: Request, res: Response) => {
         await db.insert(waitlist).values({ email }).returning();
         res.status(201).json({ success: true, message: `You've been added to waitlist.` });
     } catch (error) {
-        console.error('Error adding to waitlist:', error);
         res.status(500).json({ success: false, message: 'Failed to add to waitlist.' });
     }
 }

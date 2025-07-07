@@ -80,7 +80,7 @@ export const register = async (req: customRequest, res: Response) => {
       },
     });
   } catch (error) {
-    console.error("Registration error:", error);
+    logger.error("Registration error:", error);
     res.status(500).json({
       success: false,
       message: "Error creating user",
@@ -134,13 +134,13 @@ export const login = async (req: customRequest, res: Response) => {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       sameSite: "none",
-      domain: ".ameyashr.in",
+      secure: true,
       maxAge: 15 * 60 * 1000, // 15 minutes
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       sameSite: "none",
-      domain: ".ameyashr.in",
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -155,7 +155,7 @@ export const login = async (req: customRequest, res: Response) => {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    logger.error("Login error:", error);
     res.status(500).json({
       success: false,
       message: "Error during login",
@@ -171,10 +171,13 @@ export const logout = async (req: customRequest, res: Response) => {
       await db.delete(tokens).where(eq(tokens.token, refreshToken));
     }
 
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      sameSite: "none",
+    });
     res.clearCookie("refreshToken", {
       httpOnly: true,
       sameSite: "none",
-      domain: ".ameyashr.in",
     });
 
     res.json({
@@ -182,7 +185,7 @@ export const logout = async (req: customRequest, res: Response) => {
       message: "Successfully logged out",
     });
   } catch (error) {
-    console.error("Logout error:", error);
+    logger.error("Logout error:", error);
     res.status(500).json({
       success: false,
       message: "Error during logout",
@@ -222,10 +225,9 @@ export const refresh = async (req: customRequest, res: Response) => {
       return;
     }
 
-    // Check if token is expired
+    await db.delete(tokens).where(eq(tokens.token, refreshToken));
+
     if (new Date() > tokenRecord.expiresAt) {
-      // Clean up expired token
-      await db.delete(tokens).where(eq(tokens.token, refreshToken));
       res.status(401).json({
         success: false,
         message: "Refresh token expired",
@@ -240,26 +242,24 @@ export const refresh = async (req: customRequest, res: Response) => {
       tokenRecord.role || "user"
     );
 
-    // Delete old refresh token (token rotation)
-    await db.delete(tokens).where(eq(tokens.token, refreshToken));
-
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
+      sameSite: "none",
+      secure: true,
       maxAge: 15 * 60 * 1000, // 15 minutes
     });
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       sameSite: "none",
-      domain: ".ameyashr.in",
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Send new access token
     res.status(200).json({
-      success: true,
+      success: true
     });
   } catch (error) {
-    console.error("Token refresh error:", error);
+    logger.error("Token refresh error:", error);
     res.status(500).json({
       success: false,
       message: "Error refreshing token",
@@ -291,16 +291,14 @@ export const googleCallback = async (req: customRequest, res: Response) => {
 
         res.cookie("accessToken", accessToken, {
           httpOnly: true,
-          secure: true,
           sameSite: "none",
-          domain: ".ameyashr.in",
+          secure: true,
           maxAge: 15 * 60 * 1000, // 15 minutes
         });
         res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
-          secure: true,
           sameSite: "none",
-          domain: ".ameyashr.in",
+          secure: true,
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
@@ -381,7 +379,7 @@ export const getMe = async (req: customRequest, res: Response) => {
       data: user,
     });
   } catch (error) {
-    console.error("Get user error:", error);
+    logger.error("Get user error:", error);
     res.status(500).json({
       success: false,
       message: "Error fetching user information",
