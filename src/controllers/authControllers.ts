@@ -174,10 +174,12 @@ export const logout = async (req: customRequest, res: Response) => {
     res.clearCookie("accessToken", {
       httpOnly: true,
       sameSite: "none",
+      secure: true,
     });
     res.clearCookie("refreshToken", {
       httpOnly: true,
       sameSite: "none",
+      secure: true,
     });
 
     res.json({
