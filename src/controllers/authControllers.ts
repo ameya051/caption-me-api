@@ -6,16 +6,9 @@ import bcrypt from "bcrypt";
 import logger from "../logger";
 import { generateTokens } from "../util/tokenHelpers";
 import { db } from "../db";
+import { customRequest } from '../types/customRequest';
 
-interface customRequest extends Request {
-  user?: {
-    id: number;
-    email: string;
-    role?: string;
-  };
-}
-
-export const register = async (req: customRequest, res: Response) => {
+export const register = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 

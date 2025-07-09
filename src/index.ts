@@ -37,7 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(requestLogger)
 
-app.use("/api/",router)
+app.use("/api/", router)
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server is running');
 });

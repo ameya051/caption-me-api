@@ -1,14 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-
-// Extend Express Request type to include user
-interface customRequest extends Request {
-    user?: {
-        id: number;
-        email: string;
-        role?: string;
-    };
-}
+import { customRequest } from '../types/customRequest';
 
 export const authenticateJWT = async (
     req: customRequest,
