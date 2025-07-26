@@ -8,6 +8,10 @@ import {
   getTranscriptionFile,
 } from "../util/transcribeHelpers";
 import logger from "../logger";
+import { customRequest } from "../types/customRequest";
+import { db } from "../db";
+import { videos } from "../db/schema";
+import { desc, eq } from "drizzle-orm";
 
 export const getPresignedUrl = async (req: Request, res: Response) => {
   try {
@@ -94,3 +98,45 @@ export const getTranscription = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getVideoByUserId = async (req: customRequest, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const videosList = await db
+      .select()
+      .from(videos)
+      .where(eq(videos.userId,userId))
+      .orderBy(desc(videos.createdAt))
+
+    if (videosList.length === 0) {
+      res.status(404).json({ message: "No videos found for this user" });
+      return;
+    }
+
+    res.status(200).json(videosList);
+  } catch (error) {
+
+  }
+}
+
+export const createVideo = async (req: customRequest, res: Response) => {
+  try {
+    const { title, fileName, fileUrl } = req.body;
+    if (!fileName || !fileUrl) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+    const userId = req.user.id;
+    const videoUrl=`https://caption-me-s3-bucket.s3.ap-south-1.amazonaws.com/${fileName}`;
+    const [video]= await db.insert(videos).values({
+      userId,
+      title,
+      fileName,
+      url: videoUrl,
+    }).returning();
+    res.status(201).json(video);
+  } catch (error) {
+    logger.error("Error creating video:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
